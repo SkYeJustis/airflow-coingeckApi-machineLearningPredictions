@@ -1,17 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from Cryptocurrency.data_retrieval import CoinGeckoApi
+from Cryptocurrency.data_predict import CryptoDataPredictions
 import pandas as pd
 from datetime import datetime, timedelta
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 
 class DatabaseOperator:
 
     def __init__(self, connection=None):
         self.connection = connection or 'postgresql+psycopg2://postgres:postgres@localhost:5433/cryptocurrency'
-
-
+        self.cdp = CryptoDataPredictions()
 
     def create_engine_pgsql(self):
         #postgresql+psycopg2://user:password@hostname:host/database_name
@@ -23,8 +21,6 @@ class DatabaseOperator:
         print("TABLE NAME: {0}".format(table_name))
         df.to_sql(table_name, con=self.engine, if_exists="append", index=False)
 
-    ######################################
-    # IN - PROGRESS: For data predictions
     def get_db_data(self, end_ts):
         Session = sessionmaker()
         Session.configure(bind=self.engine)
@@ -42,33 +38,21 @@ class DatabaseOperator:
         self.df = df
         return df
 
-    ######################################
-    # IN - PROGRESS: For data predictions
-    def insert_to_db_predictions(self, table_name, end_ts):
-        X = self.df['current_price']
-        model = ExponentialSmoothing(X)
-        model_fit = model.fit()
-
-        # Predict 1 day at a time
-        yhat = model_fit.forecast(1).values[0]
-        pred_data = [[end_ts, yhat]]
-        pred_data_df = pd.DataFrame(data=pred_data,
-                     columns= ['date', 'HoltExponentialSmoothing'])
+    def insert_to_db_predictions(self, table_name, model_type, end_ts):
+        x = self.df['current_price']
+        print(self.df['current_price'])
+        self.cdp.fit_ts_univariate_model(x, model_type)
+        pred_data_df = self.cdp.predict_ts_univariate_model(end_ts, model_type)
         pred_data_df.to_sql(table_name, con=self.engine, if_exists="append", index=False)
-
-        return yhat
+        print(pred_data_df.get_values())
 
 if __name__ == '__main__':
     db_oper = DatabaseOperator()
     db_oper.create_engine_pgsql()
-
-    #cga  = CoinGeckoApi()
-    #df = cga.get_data('29-12-2018')
-    #db_oper.insert_to_db(df, '{0}_historical_data'.format('bitcoin'))
-
-    df = db_oper.get_db_data('2019-05-10')
+    prediction_date = '2019-05-10'
+    df = db_oper.get_db_data(prediction_date)
     print(df.columns)
     print(df.get_values())
 
-    x = db_oper.insert_to_db_predictions("bitcoin_forecasts")
+    x = db_oper.insert_to_db_predictions("bitcoin_forecasts", "ExponentialSmoothing", prediction_date)
     print(x)

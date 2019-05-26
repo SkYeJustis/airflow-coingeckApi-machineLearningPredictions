@@ -1,5 +1,5 @@
 from Cryptocurrency.database_connect import DatabaseOperator
-from Cryptocurrency.data_retrieval import CoinGeckoApi
+from Cryptocurrency.data_collect import CoinGeckoApi
 
 # crypto
 # ccy

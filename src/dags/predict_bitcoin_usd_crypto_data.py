@@ -7,14 +7,14 @@ SCHEDULE_INTERVAL = '@daily'
 
 default_args = {
     'owner': 'SkYe',
-    'start_date': datetime(2019,1,1),
+    'start_date': datetime(2019,2,1),
     'email_on_failure': True,
     'email_on_retry': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=1)
 }
 
-DAG_VERSION = 'COLLECT-CRYPTO-BTC-USD-1.0'
+DAG_VERSION = 'PREDICT-CRYPTO-BTC-USD-1.0'
 
 dag = DAG(DAG_VERSION,
           default_args=default_args,
