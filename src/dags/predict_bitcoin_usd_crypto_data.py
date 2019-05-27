@@ -41,4 +41,15 @@ make_db_predictions__simple_exp_smoothing = PythonOperator(
     dag=dag
 )
 
-make_db_predictions__exponential_smoothing >> make_db_predictions__simple_exp_smoothing
+make_db_predictions__arima = PythonOperator(
+    task_id = 'make_db_predictions__arima',
+    python_callable=core_make_db_predictions,
+    retries=0,
+    provide_context=True,
+    op_kwargs={"model_type": "ARIMA"},
+    dag=dag
+)
+
+make_db_predictions__exponential_smoothing
+make_db_predictions__simple_exp_smoothing
+make_db_predictions__arima
