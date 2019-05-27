@@ -19,7 +19,7 @@ DAG_VERSION = 'PREDICT-CRYPTO-BTC-USD-1.0'
 dag = DAG(DAG_VERSION,
           default_args=default_args,
           schedule_interval=SCHEDULE_INTERVAL,
-          concurrency=1,
+          concurrency=10,
           max_active_runs=1,
           catchup=True)
 
