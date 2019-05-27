@@ -1,5 +1,5 @@
 from statsmodels.tsa.holtwinters import ExponentialSmoothing, SimpleExpSmoothing
-from statsmodels.tsa.arima_model import ARMA
+from statsmodels.tsa.arima_model import ARIMA
 import pandas as pd
 
 class CryptoDataPredictions:
@@ -11,6 +11,9 @@ class CryptoDataPredictions:
         if model_type == 'ExponentialSmoothing':
             model = ExponentialSmoothing(x)
             model_fit = model.fit()
+        elif model_type == 'ARIMA':
+            model = ARIMA(x, order=(1, 1, 1))
+            model_fit = model.fit(disp=False)
         else:
             model = SimpleExpSmoothing(x)
             model_fit = model.fit()
@@ -18,7 +21,10 @@ class CryptoDataPredictions:
 
     def predict_ts_univariate_model(self, end_ts, model_type = 'SimpleExpSmoothing'):
         # Predict 1 day at a time
-        yhat = self.models[model_type].forecast(1).values[0]
+        if model_type == 'ARIMA':
+            yhat = self.models[model_type].forecast()[0][0]
+        else:
+            yhat = self.models[model_type].forecast(1).values[0]
         pred_data = [[end_ts, model_type, yhat]]
         return pd.DataFrame(data=pred_data, columns=['date', 'model_type', 'prediction_value'])
 
@@ -48,6 +54,13 @@ if __name__ == '__main__':
     cdp = CryptoDataPredictions()
 
     cdp.fit_ts_univariate_model(x, model_type='SimpleExpSmoothing')
+    cdp.fit_ts_univariate_model(x, model_type='ARIMA')
+
+    pred = cdp.predict_ts_univariate_model(pred_date, model_type = 'ARIMA')
+    print(pred.get_values())
+
+    pred = cdp.predict_ts_univariate_model(pred_date, model_type = 'SimpleExpSmoothing')
+    print(pred.get_values())
 
 # = sql to check data  =
 # SELECT TO_TIMESTAMP(d.date,'DD-MM-YYYY'), model_type, current_price, prediction_value
