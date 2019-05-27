@@ -7,7 +7,7 @@ SCHEDULE_INTERVAL = '@daily'
 
 default_args = {
     'owner': 'SkYe',
-    'start_date': datetime(2019,1,1),
+    'start_date': datetime(2019,2,1),
     'email_on_failure': True,
     'email_on_retry': False,
     'retries': 3,

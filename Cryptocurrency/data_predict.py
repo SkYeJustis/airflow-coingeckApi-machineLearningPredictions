@@ -22,4 +22,5 @@ class CryptoDataPredictions:
         return pd.DataFrame(data=pred_data, columns=['date', 'model_type', 'prediction_value'])
 
 if __name__ == '__main__':
+    #Any test code
     pass

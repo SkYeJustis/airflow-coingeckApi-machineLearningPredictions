@@ -8,7 +8,6 @@ import pandas as pd
 
 class CoinGeckoApi:
 
-
     def __init__(self, crypto='bitcoin', ccy='usd'):
         self.crypto = crypto
         self.ccy = ccy
@@ -76,12 +75,9 @@ class CoinGeckoApi:
             print("RETURNING NONE")
             return None
 
-
 if __name__ == '__main__':
     cga = CoinGeckoApi()
     df = cga.get_data('30-12-2018')
-    #print(obj)
-    #print(obj['market_data']['current_price']['usd'])
 
 
 

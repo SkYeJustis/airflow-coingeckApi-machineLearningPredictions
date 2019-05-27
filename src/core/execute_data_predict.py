@@ -1,22 +1,10 @@
 from Cryptocurrency.database_connect import DatabaseOperator
-from Cryptocurrency.data_collect import CoinGeckoApi
 
-# crypto
-# ccy
-# date
-
-# https://diogoalexandrefranco.github.io/about-airflow-date-macros-ds-and-execution-date/
-
-def core_get_data(**kwargs):
+def core_make_db_predictions(**kwargs):
     task_instance = kwargs['ti']
-    execution_date = task_instance.execution_date.strftime("%d-%m-%Y")
-    crypto_df = CoinGeckoApi(crypto=kwargs['crypto'], ccy=kwargs['ccy']).get_data(execution_date)
-    task_instance.xcom_push(key='crypto_df', value=crypto_df)
-
-
-def core_db_insert_to_db(**kwargs):
-    task_instance = kwargs['ti']
+    # '2019-05-10' -> '%Y-%m-%d' ->  yyyy-mm-dd
+    prediction_date = task_instance.execution_date.strftime('%Y-%m-%d')
     db_oper = DatabaseOperator()
     db_oper.create_engine_pgsql()
-    crypto_df = task_instance.xcom_pull(key='crypto_df', task_ids='get_crypto_data')
-    db_oper.insert_to_db(crypto_df, kwargs['table_name'])
+    db_oper.get_db_data(prediction_date)
+    db_oper.insert_to_db_predictions("bitcoin_forecasts", "ExponentialSmoothing", prediction_date)

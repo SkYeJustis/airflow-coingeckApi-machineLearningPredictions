@@ -21,7 +21,7 @@ class DatabaseOperator:
         print("TABLE NAME: {0}".format(table_name))
         df.to_sql(table_name, con=self.engine, if_exists="append", index=False)
 
-    def get_db_data(self, end_ts):
+    def get_db_data(self, pred_date):
         Session = sessionmaker()
         Session.configure(bind=self.engine)
         session = Session()
@@ -31,28 +31,27 @@ class DatabaseOperator:
 
         #df['date_format'] = df[['date']].strftime('%Y%m%d')
 
-        end_ts_obj = datetime.strptime(end_ts, '%Y-%m-%d')
+        end_ts_obj = datetime.strptime(pred_date, '%Y-%m-%d')
         final_end_ts = end_ts_obj - timedelta(days=1)
         print(final_end_ts)
         df = df[(df['date'] < final_end_ts)]
         self.df = df
-        return df
 
     def insert_to_db_predictions(self, table_name, model_type, end_ts):
         x = self.df['current_price']
-        print(self.df['current_price'])
+        #print(self.df['current_price'])
         self.cdp.fit_ts_univariate_model(x, model_type)
         pred_data_df = self.cdp.predict_ts_univariate_model(end_ts, model_type)
         pred_data_df.to_sql(table_name, con=self.engine, if_exists="append", index=False)
-        print(pred_data_df.get_values())
+        #print(pred_data_df.get_values())
 
 if __name__ == '__main__':
     db_oper = DatabaseOperator()
     db_oper.create_engine_pgsql()
-    prediction_date = '2019-05-10'
-    df = db_oper.get_db_data(prediction_date)
-    print(df.columns)
-    print(df.get_values())
 
-    x = db_oper.insert_to_db_predictions("bitcoin_forecasts", "ExponentialSmoothing", prediction_date)
-    print(x)
+    # Testing prediction sequence
+    prediction_date = '2019-05-05'
+    db_oper.get_db_data(prediction_date)
+    print(db_oper.df.columns)
+    print(db_oper.df.get_values())
+    db_oper.insert_to_db_predictions("bitcoin_forecasts", "ExponentialSmoothing", prediction_date)

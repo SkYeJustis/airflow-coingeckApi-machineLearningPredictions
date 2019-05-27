@@ -1,12 +1,6 @@
 from Cryptocurrency.database_connect import DatabaseOperator
 from Cryptocurrency.data_collect import CoinGeckoApi
 
-# crypto
-# ccy
-# date
-
-# https://diogoalexandrefranco.github.io/about-airflow-date-macros-ds-and-execution-date/
-
 def core_get_data(**kwargs):
     task_instance = kwargs['ti']
     execution_date = task_instance.execution_date.strftime("%d-%m-%Y")
