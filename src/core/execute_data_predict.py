@@ -7,4 +7,4 @@ def core_make_db_predictions(**kwargs):
     db_oper = DatabaseOperator()
     db_oper.create_engine_pgsql()
     db_oper.get_db_data(prediction_date)
-    db_oper.insert_to_db_predictions("bitcoin_forecasts", "ExponentialSmoothing", prediction_date)
+    db_oper.insert_to_db_predictions(table_name="bitcoin_forecasts", model_type=kwargs['model_type'], end_ts=prediction_date)
